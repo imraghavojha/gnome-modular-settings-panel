@@ -1,0 +1,8 @@
+{
+    "name": "Modular Settings Panel",
+    "description": "A modular GNOME Shell extension for creating custom toggle panels.",
+    "uuid": "modular-settings-panel@example.com",
+    "shell-version": [
+        "45"
+    ]
+}
