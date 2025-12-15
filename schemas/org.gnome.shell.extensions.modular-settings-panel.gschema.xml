@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.modular-settings-panel" path="/org/gnome/shell/extensions/modular-settings-panel/">
+    <key name="show-indicator" type="b">
+      <default>true</default>
+      <summary>Show the panel indicator</summary>
+    </key>
+  </schema>
+</schemalist>
