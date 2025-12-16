@@ -3,12 +3,14 @@
 const { St, Gio } = imports.gi;
 const Main = imports.ui.main;
 const ExtensionUtils = imports.misc.extensionUtils;
+const Me = ExtensionUtils.getCurrentExtension();
 
 class Extension {
     constructor(uuid) {
         this._uuid = uuid;
         this._settings = ExtensionUtils.getSettings(
             'org.gnome.shell.extensions.modular-settings-panel');
+        this._modules = [];
     }
 
     enable() {
@@ -30,26 +32,16 @@ class Extension {
     disable() {
         this._hideIndicator();
         this._settings = null;
+        this._modules = [];
     }
 
     _showIndicator() {
         if (!this._indicator) {
-            this._indicator = new St.Bin({
+            this._indicator = new St.BoxLayout({
                 style_class: 'panel-button',
-                reactive: true,
-                can_focus: true,
-                track_hover: true
             });
 
-            let icon = new St.Icon({
-                icon_name: 'system-run-symbolic',
-                style_class: 'system-status-icon'
-            });
-
-            this._indicator.set_child(icon);
-            this._indicator.connect('button-press-event', () => {
-                Main.notify('Hello World!');
-            });
+            this._loadModules();
 
             Main.panel.addToStatusArea(this._uuid, this._indicator);
         }
@@ -57,9 +49,32 @@ class Extension {
 
     _hideIndicator() {
         if (this._indicator) {
+            this._unloadModules();
             this._indicator.destroy();
             this._indicator = null;
         }
+    }
+
+    _loadModules() {
+        const modulesDir = Me.dir.get_child('modules');
+        const files = modulesDir.enumerate_children(
+            'standard::name', Gio.FileQueryInfoFlags.NONE, null);
+
+        let file;
+        while ((file = files.next_file(null)) !== null) {
+            const name = file.get_name().replace('.js', '');
+            const module = Me.imports.modules[name];
+            const toggle = new module[Object.keys(module)[0]](this._settings);
+            this._modules.push(toggle);
+            this._indicator.add_child(toggle);
+        }
+    }
+
+    _unloadModules() {
+        for (const module of this._modules) {
+            module.destroy();
+        }
+        this._modules = [];
     }
 }
 
