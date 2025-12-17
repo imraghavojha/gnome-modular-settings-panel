@@ -5,5 +5,17 @@
       <default>true</default>
       <summary>Show the panel indicator</summary>
     </key>
+    <key name="keyboard-enabled" type="b">
+      <default>true</default>
+      <summary>Enable the keyboard toggle</summary>
+    </key>
+    <key name="quicksettings-enabled" type="b">
+      <default>true</default>
+      <summary>Enable the quick settings toggle</summary>
+    </key>
+    <key name="rotation-enabled" type="b">
+      <default>true</default>
+      <summary>Enable the rotation toggle</summary>
+    </key>
   </schema>
 </schemalist>

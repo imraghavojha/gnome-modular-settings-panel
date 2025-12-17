@@ -10,7 +10,8 @@ class Extension {
         this._uuid = uuid;
         this._settings = ExtensionUtils.getSettings(
             'org.gnome.shell.extensions.modular-settings-panel');
-        this._modules = [];
+        this._modules = {};
+        this._moduleConnections = [];
     }
 
     enable() {
@@ -32,7 +33,9 @@ class Extension {
     disable() {
         this._hideIndicator();
         this._settings = null;
-        this._modules = [];
+        this._modules = {};
+        this._moduleConnections.forEach(c => this._settings.disconnect(c));
+        this._moduleConnections = [];
     }
 
     _showIndicator() {
@@ -63,18 +66,37 @@ class Extension {
         let file;
         while ((file = files.next_file(null)) !== null) {
             const name = file.get_name().replace('.js', '');
-            const module = Me.imports.modules[name];
-            const toggle = new module[Object.keys(module)[0]](this._settings);
-            this._modules.push(toggle);
-            this._indicator.add_child(toggle);
+            if (this._settings.get_boolean(`${name}-enabled`)) {
+                const module = Me.imports.modules[name];
+                const toggle = new module[Object.keys(module)[0]](this._settings);
+                this._modules[name] = toggle;
+                this._indicator.add_child(toggle);
+            }
+
+            const connectionId = this._settings.connect(`changed::${name}-enabled`, () => {
+                if (this._settings.get_boolean(`${name}-enabled`)) {
+                    if (!this._modules[name]) {
+                        const module = Me.imports.modules[name];
+                        const toggle = new module[Object.keys(module)[0]](this._settings);
+                        this._modules[name] = toggle;
+                        this._indicator.add_child(toggle);
+                    }
+                } else {
+                    if (this._modules[name]) {
+                        this._modules[name].destroy();
+                        delete this._modules[name];
+                    }
+                }
+            });
+            this._moduleConnections.push(connectionId);
         }
     }
 
     _unloadModules() {
-        for (const module of this._modules) {
-            module.destroy();
+        for (const name in this._modules) {
+            this._modules[name].destroy();
         }
-        this._modules = [];
+        this._modules = {};
     }
 }
 
