@@ -76,10 +76,13 @@ class Extension {
             const connectionId = this._settings.connect(`changed::${name}-enabled`, () => {
                 if (this._settings.get_boolean(`${name}-enabled`)) {
                     if (!this._modules[name]) {
-                        const module = Me.imports.modules[name];
-                        const toggle = new module[Object.keys(module)[0]](this._settings);
-                        this._modules[name] = toggle;
-                        this._indicator.add_child(toggle);
+                        const moduleFile = modulesDir.get_child(`${name}.js`);
+                        if (moduleFile.query_exists(null)) {
+                            const module = Me.imports.modules[name];
+                            const toggle = new module[Object.keys(module)[0]](this._settings);
+                            this._modules[name] = toggle;
+                            this._indicator.add_child(toggle);
+                        }
                     }
                 } else {
                     if (this._modules[name]) {
