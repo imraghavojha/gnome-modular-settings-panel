@@ -16,6 +16,7 @@ class Extension {
 
     enable() {
         this._indicator = null;
+        this._stylesheet = Me.path + '/stylesheet.css';
 
         this._settings.connect('changed::show-indicator', () => {
             if (this._settings.get_boolean('show-indicator')) {
@@ -28,6 +29,10 @@ class Extension {
         if (this._settings.get_boolean('show-indicator')) {
             this._showIndicator();
         }
+
+        if (!Main.getThemeStylesheet().includes(this._stylesheet)) {
+            Main.getThemeManager()._addStylesheet(this._stylesheet);
+        }
     }
 
     disable() {
@@ -36,6 +41,10 @@ class Extension {
         this._modules = {};
         this._moduleConnections.forEach(c => this._settings.disconnect(c));
         this._moduleConnections = [];
+
+        if (Main.getThemeStylesheet().includes(this._stylesheet)) {
+            Main.getThemeManager()._removeStylesheet(this._stylesheet);
+        }
     }
 
     _showIndicator() {
