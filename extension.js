@@ -15,20 +15,11 @@ class Extension {
     }
 
     enable() {
-        this._indicator = null;
         this._stylesheet = Me.path + '/stylesheet.css';
 
-        this._settings.connect('changed::show-indicator', () => {
-            if (this._settings.get_boolean('show-indicator')) {
-                this._showIndicator();
-            } else {
-                this._hideIndicator();
-            }
-        });
+        this._settings.connect('changed::show-indicator', this._updateModules.bind(this));
+        this._updateModules();
 
-        if (this._settings.get_boolean('show-indicator')) {
-            this._showIndicator();
-        }
 
         if (!Main.getThemeStylesheet().includes(this._stylesheet)) {
             Main.getThemeManager()._addStylesheet(this._stylesheet);
@@ -36,9 +27,8 @@ class Extension {
     }
 
     disable() {
-        this._hideIndicator();
+        this._unloadModules();
         this._settings = null;
-        this._modules = {};
         this._moduleConnections.forEach(c => this._settings.disconnect(c));
         this._moduleConnections = [];
 
@@ -47,23 +37,11 @@ class Extension {
         }
     }
 
-    _showIndicator() {
-        if (!this._indicator) {
-            this._indicator = new St.BoxLayout({
-                style_class: 'panel-button',
-            });
-
+    _updateModules() {
+        if (this._settings.get_boolean('show-indicator')) {
             this._loadModules();
-
-            Main.panel.addToStatusArea(this._uuid, this._indicator);
-        }
-    }
-
-    _hideIndicator() {
-        if (this._indicator) {
+        } else {
             this._unloadModules();
-            this._indicator.destroy();
-            this._indicator = null;
         }
     }
 
@@ -76,21 +54,23 @@ class Extension {
         while ((file = files.next_file(null)) !== null) {
             const name = file.get_name().replace('.js', '');
             if (this._settings.get_boolean(`${name}-enabled`)) {
-                const module = Me.imports.modules[name];
-                const toggle = new module[Object.keys(module)[0]](this._settings);
-                this._modules[name] = toggle;
-                this._indicator.add_child(toggle);
+                if (!this._modules[name]) {
+                    const module = Me.imports.modules[name];
+                    const toggle = new module[Object.keys(module)[0]](this._settings);
+                    this._modules[name] = toggle;
+                    Main.panel.addToStatusArea(`${this._uuid}-${name}`, toggle);
+                }
             }
 
             const connectionId = this._settings.connect(`changed::${name}-enabled`, () => {
-                if (this._settings.get_boolean(`${name}-enabled`)) {
+                if (this._settings.get_boolean('show-indicator') && this._settings.get_boolean(`${name}-enabled`)) {
                     if (!this._modules[name]) {
                         const moduleFile = modulesDir.get_child(`${name}.js`);
                         if (moduleFile.query_exists(null)) {
                             const module = Me.imports.modules[name];
                             const toggle = new module[Object.keys(module)[0]](this._settings);
                             this._modules[name] = toggle;
-                            this._indicator.add_child(toggle);
+                            Main.panel.addToStatusArea(`${this._uuid}-${name}`, toggle);
                         }
                     }
                 } else {
