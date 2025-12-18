@@ -1,6 +1,7 @@
 'use strict';
 
-const { GObject, St } = imports.gi;
+const { GObject, St, Clutter } = imports.gi;
+const Main = imports.ui.main;
 
 var KeyboardToggle = GObject.registerClass(
 class KeyboardToggle extends St.Bin {
@@ -22,9 +23,17 @@ class KeyboardToggle extends St.Bin {
         this.set_child(icon);
 
         this.connect('button-press-event', this._toggle.bind(this));
+        this.connect('touch-event', this._toggle.bind(this));
     }
 
     _toggle() {
-        // Toggle logic goes here
+        if (Main.keyboard) {
+            if (Main.keyboard.visible) {
+                Main.keyboard.close();
+            } else {
+                Main.keyboard.open(Main.layoutManager.bottomIndex);
+            }
+        }
+        return Clutter.EVENT_STOP;
     }
 });
