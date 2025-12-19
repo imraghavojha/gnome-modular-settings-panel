@@ -61,6 +61,44 @@ function fillPreferencesWindow(window) {
         row.add_suffix(toggle);
     }
 
+    const wallpaperGroup = new Adw.PreferencesGroup({
+        title: 'Wallpaper Settings',
+    });
+    page.add(wallpaperGroup);
+
+    const lightWallpaperRow = new Adw.ActionRow({
+        title: 'Light Wallpaper',
+    });
+    wallpaperGroup.add(lightWallpaperRow);
+
+    const lightWallpaperChooser = new Gtk.FileChooserButton({
+        action: Gtk.FileChooserAction.OPEN,
+        title: 'Select Light Wallpaper',
+    });
+    settings.bind(
+        'light-wallpaper-path',
+        lightWallpaperChooser,
+        'file',
+        Gio.SettingsBindFlags.DEFAULT
+    );
+    lightWallpaperRow.add_suffix(lightWallpaperChooser);
+
+    const darkWallpaperRow = new Adw.ActionRow({
+        title: 'Dark Wallpaper',
+    });
+    wallpaperGroup.add(darkWallpaperRow);
+
+    const darkWallpaperChooser = new Gtk.FileChooserButton({
+        action: Gtk.FileChooserAction.OPEN,
+        title: 'Select Dark Wallpaper',
+    });
+    settings.bind(
+        'dark-wallpaper-path',
+        darkWallpaperChooser,
+        'file',
+        Gio.SettingsBindFlags.DEFAULT
+    );
+    darkWallpaperRow.add_suffix(darkWallpaperChooser);
 
     window.add(page);
 }

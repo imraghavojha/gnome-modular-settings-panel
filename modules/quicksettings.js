@@ -6,9 +6,6 @@ const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const Slider = imports.ui.slider;
 
-const LIGHT_WALLPAPER = GLib.get_home_dir() + '/Pictures/Wallpaper/a_cartoon_of_a_cat_in_a_glass.png';
-const DARK_WALLPAPER = GLib.get_home_dir() + '/Pictures/Wallpaper/a_cartoon_of_a_cat_in_a_glass_dark.png';
-
 var QuickSettingsToggle = GObject.registerClass(
 class QuickSettingsToggle extends PanelMenu.Button {
     _init(settings) {
@@ -98,16 +95,23 @@ class QuickSettingsToggle extends PanelMenu.Button {
     }
 
     _onDarkModeToggled(item, state) {
+        const lightWallpaperPath = this._appSettings.get_string('light-wallpaper-path');
+        const darkWallpaperPath = this._appSettings.get_string('dark-wallpaper-path');
+
         if (state) {
             this.interfaceSettings.set_string('color-scheme', 'prefer-dark');
             this.interfaceSettings.set_string('gtk-theme', 'Pop-dark');
-            this.backgroundSettings.set_string('picture-uri', 'file://' + DARK_WALLPAPER);
-            this.backgroundSettings.set_string('picture-uri-dark', 'file://' + DARK_WALLPAPER);
+            if (darkWallpaperPath) {
+                this.backgroundSettings.set_string('picture-uri', 'file://' + darkWallpaperPath);
+                this.backgroundSettings.set_string('picture-uri-dark', 'file://' + darkWallpaperPath);
+            }
         } else {
             this.interfaceSettings.set_string('color-scheme', 'prefer-light');
             this.interfaceSettings.set_string('gtk-theme', 'Pop');
-            this.backgroundSettings.set_string('picture-uri', 'file://' + LIGHT_WALLPAPER);
-            this.backgroundSettings.set_string('picture-uri-dark', 'file://' + LIGHT_WALLPAPER);
+            if (lightWallpaperPath) {
+                this.backgroundSettings.set_string('picture-uri', 'file://' + lightWallpaperPath);
+                this.backgroundSettings.set_string('picture-uri-dark', 'file://' + lightWallpaperPath);
+            }
         }
     }
 

@@ -17,5 +17,13 @@
       <default>true</default>
       <summary>Enable the rotation toggle</summary>
     </key>
+    <key name="light-wallpaper-path" type="s">
+      <default>''</default>
+      <summary>Path to the light mode wallpaper</summary>
+    </key>
+    <key name="dark-wallpaper-path" type="s">
+      <default>''</default>
+      <summary>Path to the dark mode wallpaper</summary>
+    </key>
   </schema>
 </schemalist>
