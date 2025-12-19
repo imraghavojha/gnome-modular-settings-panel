@@ -6,3 +6,12 @@
     icon-size: 1.14em;
     padding: 0 5px;
 }
+
+/* Quick Settings Panel */
+.quick-settings-menu {
+    min-width: 300px;
+}
+
+.quick-settings-slider {
+    padding: 8px 12px;
+}
