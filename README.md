@@ -1,6 +1,6 @@
 # GNOME Modular Settings Panel
+I made this for my own latop which runs gnome. There were issues with defualt keyboard popping in touch mode, options for night light not showing up and rotation being buggy. These 3 extensions solve that problem.
 
-A modular GNOME Shell extension for creating custom toggle panels.
 
 ## Features
 
